@@ -6,7 +6,11 @@ const server = http.createServer(app);
 const socket = require('socket.io');
 const io = socket(server);
 const Room = require('./schema'); // Import the MongoDB schema
-const db = require('./db'); // Import the database connection
+const { connect } = require('http2');
+
+
+// Connect to MongoDB
+connectDB();
 
 io.on('connection', socket => {
   socket.on('join room', async roomID => {
@@ -46,5 +50,6 @@ io.on('connection', socket => {
     io.to(incoming.target).emit('ice-candidate', incoming.candidate);
   });
 });
+
 
 server.listen(8000, () => console.log('Server is running on port 8000'));
