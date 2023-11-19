@@ -13,17 +13,47 @@ const  dotenv = require('dotenv');
 dotenv.config();
 const cors = require('cors');
 
+const { v4: uuidv4 } = require("uuid");
+
+
 //render the view
 app.set("view engine", "ejs");
 
 // Middleware
-app.use(cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
+
+
+const corsOptions = {
+  origin: "*",// Or whichever origin you want to allow
+  methods: ['GET', 'POST'], // Or whichever methods you want to allow
+  allowedHeaders: ['Content-Type', 'Authorization'], // Or whichever headers you want to allow
+};
+
+app.use(cors(corsOptions));
+
+
+
 // Connect to MongoDB
 connectDB();  
 
+
+
+app.use(express.static('public'));
+
+app.get("/", (req, res) => {
+    const roomID = uuidv4();
+    console.log('Redirecting to a new room:', roomID);
+    res.redirect(`/${roomID}`);
+});
+
+//join room
+app.get("/:room", (req, res) => {
+    console.log('Rendering room:', req.params.room);
+    res.render("room", { roomId: req.params.room });
+});
 
 
 io.on('connection', socket => {
@@ -31,7 +61,7 @@ io.on('connection', socket => {
 
   socket.on('join room', async roomID => {
     console.log('A user is trying to join a room:', roomID);
-
+  //socket.join(roomID);
     try {
       // Find or create a room in the database
       let room = await Room.findOne({ roomID });
@@ -57,7 +87,7 @@ io.on('connection', socket => {
       console.error('Error joining room:', error);
     }
   });
-  
+
   socket.on('disconnect', async () => {
     console.log('A user disconnected:', socket.id);
   
@@ -98,22 +128,6 @@ io.on('connection', socket => {
     console.log('Received an ICE candidate from:', incoming.caller);
     io.to(incoming.target).emit('ice-candidate', incoming.candidate);
   });
-});
-
-const { v4: uuidv4 } = require("uuid");
-
-app.use(express.static('public'));
-
-app.get("/", (req, res) => {
-    const roomID = uuidv4();
-    console.log('Redirecting to a new room:', roomID);
-    res.redirect(`/${roomID}`);
-});
-
-//join room
-app.get("/:room", (req, res) => {
-    console.log('Rendering room:', req.params.room);
-    res.render("room", { roomId: req.params.room });
 });
 
 server.listen(PORT, () => console.log(`socket Server is running on ${PORT}`));
