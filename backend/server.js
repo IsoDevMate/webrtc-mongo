@@ -5,7 +5,7 @@ const express = require('express');
 const app = express();
 const server = http.createServer(app);
 const socket = require('socket.io');
-const io = socket(server);
+//const io = socket(server);
 const Room = require('./schema'); // Import the MongoDB schema
 const{connectDB} = require('./db'); // Import the MongoDB connection function
 const PORT = process.env.PORT || 3000;
@@ -14,6 +14,14 @@ dotenv.config();
 const cors = require('cors');
 
 const { v4: uuidv4 } = require("uuid");
+
+
+const io = socket(server, {
+  cors: {
+    origin: "*",  // Allow all origins
+    methods: ["GET", "POST"]  // Allow only GET and POST request methods
+  }
+});
 
 
 //render the view
@@ -25,14 +33,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-
+/*
 const corsOptions = {
   origin: "*",// Or whichever origin you want to allow
   methods: ['GET', 'POST'], // Or whichever methods you want to allow
-  allowedHeaders: ['Content-Type', 'Authorization'], // Or whichever headers you want to allow
-};
+  allowedHeaders: ['Content-Type', 'Authorization',"Access-Control-Allow-Origin": "*",], // Or whichever headers you want to allow
+  credentials:true,            //access-control-allow-credentials:true
+  optionSuccessStatus:200
+};*/
 
-app.use(cors(corsOptions));
+//app.use(cors(corsOptions));
 
 
 
@@ -58,8 +68,8 @@ app.get("/:room", (req, res) => {
 
 io.on('connection', socket => {
   console.log('A user connected:', socket.id);
-
-  socket.on('join room', async roomID => {
+ 
+  socket.on('join room', async (roomID) => {
     console.log('A user is trying to join a room:', roomID);
   //socket.join(roomID);
     try {
@@ -74,6 +84,7 @@ io.on('connection', socket => {
         console.log('Room found, adding user to the room:', roomID);
         room.users.push(socket.id);
         await room.save();
+        console.log('Room ID:', room.roomID, ', Number of users in the room:', room.users.length);
       }
 
       const otherUser = room.users.find(id => id !== socket.id);
@@ -101,7 +112,7 @@ io.on('connection', socket => {
         // Remove the user from the room
         room.users = room.users.filter(id => id !== socket.id);
         await room.save();
-  
+        console.log('Room ID:', room.roomID, ', Number of users left in the room:', room.users.length);
         // Notify the other users in the room
         room.users.forEach(userId => {
           socket.to(userId).emit('user disconnected', socket.id);
@@ -129,5 +140,7 @@ io.on('connection', socket => {
     io.to(incoming.target).emit('ice-candidate', incoming.candidate);
   });
 });
+
+
 
 server.listen(PORT, () => console.log(`socket Server is running on ${PORT}`));
