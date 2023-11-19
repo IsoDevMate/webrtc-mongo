@@ -57,6 +57,31 @@ io.on('connection', socket => {
       console.error('Error joining room:', error);
     }
   });
+  
+  socket.on('disconnect', async () => {
+    console.log('A user disconnected:', socket.id);
+  
+    try {
+      // Find the room the user is in
+      let room = await Room.findOne({ users: socket.id });
+  
+      if (room) {
+        console.log('Room found, removing user from the room:', room.roomID);
+  
+        // Remove the user from the room
+        room.users = room.users.filter(id => id !== socket.id);
+        await room.save();
+  
+        // Notify the other users in the room
+        room.users.forEach(userId => {
+          socket.to(userId).emit('user disconnected', socket.id);
+        });
+      }
+    } catch (error) {
+      console.error('Error disconnecting user:', error);
+    }
+  });
+  
 
   // Socket event handlers for WebRTC signaling
   socket.on('offer', payload => {
