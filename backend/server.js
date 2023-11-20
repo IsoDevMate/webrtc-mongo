@@ -8,7 +8,7 @@ const socket = require('socket.io');
 //const io = socket(server);
 const Room = require('./schema'); // Import the MongoDB schema
 const{connectDB} = require('./db'); // Import the MongoDB connection function
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 const  dotenv = require('dotenv');
 dotenv.config();
 const cors = require('cors');

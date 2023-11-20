@@ -17,7 +17,7 @@ const RoomLogic = () => {
             userVideo.current.srcObject = stream;
             userStream.current = stream;
 
-            socketRef.current = io.connect("http://localhost:3000");
+            socketRef.current = io.connect("http://localhost:5000");
             socketRef.current.emit("join room", roomID);
 
             socketRef.current.on('other user', userID => {
@@ -131,18 +131,18 @@ const RoomLogic = () => {
     function handleTrackEvent(e) {
         partnerVideo.current.srcObject = e.streams[0];
     };
-    
+
     return (
         <div style={{
             display: 'flex',
-            flexDirection: 'row', // Change to 'row' to display videos side by side
+            flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
             height: '100vh',
             backgroundColor: '#333'
         }}>
-            <video style={{ borderRadius: '15px', margin: '10px', width: '50%' }} autoPlay ref={userVideo} />
-            <video style={{ borderRadius: '15px', margin: '10px', width: '50%' }} autoPlay ref={partnerVideo} />
+            <video style={{ borderRadius: '15px', margin: '10px' }} autoPlay ref={userVideo} />
+            <video style={{ borderRadius: '15px', margin: '10px' }} autoPlay ref={partnerVideo} />
             <ButtonComponent />
         </div>
     );
