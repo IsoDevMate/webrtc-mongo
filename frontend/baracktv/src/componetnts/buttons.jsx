@@ -41,10 +41,10 @@ const ButtonComponent = ({ onToggleMute, isMuted }) => {
   return (
     <div>
       <button style={buttonStyle} onClick={handleStart}>
-        Start
+        StartRecording
       </button>
       <button style={buttonStyle} onClick={handleCall}>
-        Call
+        Reactions
       </button>
       <button style={buttonStyle} onClick={handleHangUp}>
         Hang Up
