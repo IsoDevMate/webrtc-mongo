@@ -26,7 +26,7 @@ const io = socket(server, {
 
 
 //render the view
-app.set("view engine", "ejs");
+//app.set("view engine", "ejs");
 
 // Middleware
 
@@ -52,7 +52,7 @@ connectDB();
 
 
 
-app.use(express.static('public'));
+//app.use(express.static('public'));
 
 app.get("/", (req, res) => {
     const roomID = uuidv4();
