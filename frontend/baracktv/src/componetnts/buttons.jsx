@@ -35,7 +35,7 @@ const ButtonComponent = ({ onToggleMute, isMuted }) => {
 
   const muteButtonStyle = {
     ...buttonStyle,
-    backgroundColor: isMuted ? '#dc3545' : '#28a745', // Red when muted, green when unmuted
+    backgroundColor: isMuted ? '#28a745' : ' #dc3545', // Red when muted, green when unmuted
   };
 
   return (
@@ -50,7 +50,7 @@ const ButtonComponent = ({ onToggleMute, isMuted }) => {
         Hang Up
       </button>
       <button style={muteButtonStyle} onClick={handleToggleMute}>
-        {isMuted ? 'Unmute' : 'Mute'}
+        {isMuted ? 'Mute': 'Unmute'}
       </button>
     </div>
   );
